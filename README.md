@@ -22,4 +22,4 @@ You may also see any lint errors in the console.
 
 ### `Usage`
 
-Create a new user on `/api/usuario/register`, and then log in in `/api/usuario/login` for a jwsToken that has to be included in the header (as `token`) of every petition that is not metioned before.
+Create a new user on `/api/usuario/register`, and then log in on `/api/usuario/login` for a jwsToken that has to be included in the header (as `token`) of every petition that is not metioned before. By default, the server will be mounted on `http:\\localhost:3001`.
