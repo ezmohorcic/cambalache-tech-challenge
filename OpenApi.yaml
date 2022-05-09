@@ -1,0 +1,306 @@
+openapi: 3.0.0
+info:
+  title: c-tech challenge
+  version: 1.0.0
+
+servers: 
+  - url: http://localhost:3001/api/
+
+paths:
+  /usuario:
+    /register:
+      post:
+        summary: Registra al usuario.
+
+        requestBody:
+          required: true
+          content: 
+            application/json:
+              schema:
+                type: object
+                  properties:
+                    email: type: string
+                    password: type: string
+                    nombre: type: string
+                    nacimiento: type: string
+                    lenguajes: type: array(string)
+        
+        responses:
+          '200':
+            description: objeto con datos dados e id de usuario.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties: 
+                    id: type: string
+                    email: type: string
+                    password: type: string
+                    nombre: type: string
+                    nacimiento: type: string
+                    lenguajes: type: array(string)
+          '500':
+            description: Error por server
+          '401': 
+            description:  error de token.
+    
+    /login:
+      post:
+        summary: login de usuario para jwtoken
+
+        requestBody:
+          required: true
+          content: 
+            application/json:
+              schema:
+                type: object
+                  properties:
+                    email: type: string
+                    password: type: string
+        
+        responses:
+          '200':
+            description: objeto con datos dados e id de usuario.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties: 
+                    id: type: string
+                    email: type: string
+                    password: type: string
+                    nombre: type: string
+                    nacimiento: type: string
+                    lenguajes: type: array(string)
+                    token: type: string
+          '500':
+            description: Error por server
+          '404':
+            description: El id dado no existe
+    # ----- De aca para abajo todas las request necesiten en header token: ,dada en login ----- #
+    put:
+      summary: Cambia el nombre del usuario.
+
+      parameters:
+        -in:  header
+        name: token
+        schema: 
+          type: string
+          required: true
+
+      requestBody:
+          required: true
+          content: 
+            application/json:
+              schema:
+                type: object
+                  properties:
+                    id: type: string
+                    nombre: type: string
+      
+      responses:  
+        '200':  nombre cambiado correctamente
+        '500':  error en servidor
+        '404':  id no corresponde a un usuario registrado
+        '401': 
+            description:  error de token.
+
+  /repositorio:
+    post:
+      summary: Crea un nuevo repositorio.
+
+      parameters:
+        -in:  header
+        name: token
+        schema: 
+          type: string
+          required: true
+
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+                properties:
+                  idUsuario: type: string
+                  nombre: type: string
+                  lenguajes: type: array(string)
+      
+      responses:
+        '200':
+          description: objeto con datos dados e id de usuario.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  id: type: string                  
+                  idUsuario: type: string
+                  nombre: type: string
+                  lenguajes: type: array(string)
+        '500':
+          description: Error por server
+        '409':
+          description:  repositorio con mismo nombre ya existente.
+
+    get:
+      summary:  Busca repositorio por id.
+
+      parameters:
+        -in: query
+          name: id
+          schema: type: string
+          description:  id del repositorio a buscar
+        -in:  header
+          name: token
+          schema: 
+          type: string
+          required: true
+
+      response:
+        '200':
+          description:  Repositorio encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  id: type: string
+                  idUsuario:  type:  string
+                  fechaCreacion: type: string
+                  nombre: type: string
+                  lenguajes: type: array(string)
+        '500':
+          description: Error por server
+        '404':
+          description:  Id no corresponde a un repositorio existente.
+
+    put:
+      summary: Cambia el nombre del repositorio.
+      
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+                properties:
+                  id: type: string
+                  nombre: type: string
+      
+      responses:
+        '200':
+          description:  Nombre cambiado con exito.
+        '500':
+          description: Error por server
+        '404':
+          description:  Id no corresponde a un repositorio existente.
+
+
+
+    /{idUsuario}:
+      get:
+        summary:  Busca repositorio por id.
+
+        parameters:
+          -in: path
+            name: id
+            schema: 
+              type: string
+              required: true
+            description:  id del repositorio a buscar
+          -in:  header
+            name: token
+            schema: 
+              type: string
+              required: true
+
+        response:
+          '200':
+            description:  Repositorios del usuario encontrados.
+            content:
+              application/json:
+                schema:
+                  type: Array
+                  items:
+                    schema:
+                      type: object
+                      schemea:
+                      properties: 
+                        id: type: string
+                        idUsuario:  type:  string
+                        fechaCreacion: type: string
+                        nombre: type: string
+                        lenguajes: type: array(string)
+          '500':
+            description: Error por server
+          '404':
+            description:  Id no corresponde a un usuario existente o no hay repositorio existente en ese usuario.
+          '401': 
+            description:  error de token.
+
+  /historial:
+    post:
+      summary: Genera una nueva entrada historial.
+
+      parameters:
+        -in:  header
+        name: token
+        schema: 
+          type: string
+          required: true
+
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+                properties:
+                  idUsuario: type: string
+                  tipo: type: string
+      
+      responses:
+        '200':
+          description: objeto con datos dados e id de historial.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  id: type: string                  
+                  idUsuario: type: string
+                  tipo: type: string
+                  horario: type: string
+        '500':
+          description: Error por server
+        '401': 
+          description:  error de token.
+
+
+    /{idUsuario}:
+      get:
+
+        response:
+          '200':
+            description:  Historial del usuario encontrados.
+            content:
+              application/json:
+                schema:
+                  type: Array
+                  items:
+                    schema:
+                      type: object
+                      schemea:
+                      properties: 
+                        id: type: string
+                        idUsuario:  type:  string
+                        horario: type: string
+                        horario: type: array(string)
+          '404':
+            description: No hay usuarios con esa id.
+          '500': 
+            description:  error de server
+          '401': 
+            description:  error de token.
